@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather API</title>
+    <link rel="stylesheet" href="style.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+
+<body>
+    <div class="container">
+        <div class="weatherCard">
+            <div class="header">
+                <div class="left">
+                    <i class="fa fa-sun"></i>
+                    <h1>Weather App</h1>
+                </div>
+                <div class="right">
+                    <input type="text" id="city" placeholder="Search City Name: ">
+                    <button id="searchBtn" onclick="getWeather()"><i class="fa-solid fa-magnifying-glass"></i></button>
+                </div>
+            </div>
+
+            <div class="weather" id="weather"></div>
+        </div>
+
+        <div class="floating-blocks">
+            <div class="block"></div>
+            <div class="block"></div>
+            <div class="block"></div>
+        </div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById('city').value;
+            const apiKey = '7dde4a84898f4040bb424028250505';
+            const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Invalid City!');
+
+                const data = await response.json();
+                const mapUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${data.location.lat},${data.location.lon}&zoom=10&size=400x300&markers=color:red|${data.location.lat},${data.location.lon}&key=YOUR_GOOGLE_MAPS_API_KEY`;
+
+                const weatherDiv = document.getElementById('weather');
+                weatherDiv.innerHTML = `
+                <div class="forecasts">
+                    <div class="top">
+                        <div>
+                            <h3>${data.location.name}</h3>
+                            <p>${data.location.region}, ${data.location.country}</p>
+                        </div>
+                    </div>
+                    <div class="bottom">
+                        <div>
+                            <i class="fa-solid fa-temperature-three-quarters temp-icon"></i>
+                            <p>Temperature: ${data.current.temp_c} &deg;C</p>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-droplet humidity-icon"></i>
+                            <p>Humidity: ${data.current.humidity}%</p>
+                        </div>
+                        <div>
+                            <i class="fa-solid fa-wind wind-icon"></i>
+                            <p>Wind: ${data.current.wind_kph} kph</p>
+                        </div>
+                    </div>
+                </div>
+                `;
+            } catch (error) {
+                document.getElementById('weather').innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+
+</html>
